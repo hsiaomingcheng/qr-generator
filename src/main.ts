@@ -1,5 +1,5 @@
 import './style.css'
-import { t, type MessageKey } from './i18n'
+import { getLanguage, initLanguage, setLanguage, t, type MessageKey } from './i18n'
 import { normalizeUrl } from './lib/url'
 import { generateQr } from './lib/qr'
 import { DEFAULT_PNG_SIZE, buildFilename, downloadPng, downloadSvg } from './lib/download'
@@ -11,12 +11,15 @@ const app = document.querySelector<HTMLDivElement>('#app')!
 app.innerHTML = `
   <main class="page">
     <header>
-      <h1>${t('app.title')}</h1>
-      <p class="subtitle">${t('app.description')}</p>
+      <div>
+        <h1 data-i18n="app.title"></h1>
+        <p class="subtitle" data-i18n="app.description"></p>
+      </div>
+      <button id="lang-switch" type="button" class="lang-switch" data-i18n="lang.switch"></button>
     </header>
 
     <div class="field">
-      <label for="url-input">${t('input.label')}</label>
+      <label for="url-input" data-i18n="input.label"></label>
       <input
         id="url-input"
         type="text"
@@ -25,40 +28,40 @@ app.innerHTML = `
         autocorrect="off"
         spellcheck="false"
         autocomplete="off"
-        placeholder="${t('input.placeholder')}"
+        data-i18n-placeholder="input.placeholder"
       />
     </div>
 
     <p id="message" class="message" aria-live="polite"></p>
 
     <section class="preview">
-      <p id="empty-hint" class="empty-hint">${t('preview.empty')}</p>
+      <p id="empty-hint" class="empty-hint" data-i18n="preview.empty"></p>
       <div id="result" hidden>
-        <img id="qr-image" class="qr-image" alt="${t('preview.alt')}" />
-        <p class="encoded"><span>${t('preview.encodedUrl')}</span><code id="encoded-url"></code></p>
+        <img id="qr-image" class="qr-image" data-i18n-alt="preview.alt" />
+        <p class="encoded"><span data-i18n="preview.encodedUrl"></span><code id="encoded-url"></code></p>
       </div>
     </section>
 
     <div class="options">
       <div class="field">
-        <label for="format-select">${t('download.format')}</label>
+        <label for="format-select" data-i18n="download.format"></label>
         <select id="format-select">
           <option value="png" selected>PNG</option>
           <option value="svg">SVG</option>
         </select>
       </div>
       <div class="field" id="size-field">
-        <label for="size-select">${t('download.size')}</label>
+        <label for="size-select" data-i18n="download.size"></label>
         <select id="size-select">
           ${PNG_SIZES.map((s) => `<option value="${s}"${s === DEFAULT_PNG_SIZE ? ' selected' : ''}>${s} px</option>`).join('')}
         </select>
       </div>
-      <p id="vector-note" class="vector-note" hidden>${t('download.vectorNote')}</p>
+      <p id="vector-note" class="vector-note" data-i18n="download.vectorNote" hidden></p>
     </div>
 
-    <button id="download" type="button" disabled>${t('download.button')}</button>
+    <button id="download" type="button" data-i18n="download.button" disabled></button>
 
-    <footer><p>${t('privacy.note')}</p></footer>
+    <footer><p data-i18n="privacy.note"></p></footer>
   </main>
 `
 
@@ -73,13 +76,34 @@ const formatSelect = app.querySelector<HTMLSelectElement>('#format-select')!
 const sizeSelect = app.querySelector<HTMLSelectElement>('#size-select')!
 const sizeField = app.querySelector<HTMLDivElement>('#size-field')!
 const vectorNote = app.querySelector<HTMLParagraphElement>('#vector-note')!
+const langSwitch = app.querySelector<HTMLButtonElement>('#lang-switch')!
 
 let currentUrl: string | null = null
 let debounceTimer: number | undefined
 let updateId = 0
+let errorKey: MessageKey | null = null
 
 function showError(key: MessageKey | null): void {
+  errorKey = key
   message.textContent = key ? t(key) : ''
+}
+
+// Re-renders every piece of text, so switching language never touches the input or the preview.
+function applyLanguage(): void {
+  document.documentElement.lang = getLanguage()
+  document.title = t('meta.title')
+  document.querySelector('meta[name="description"]')?.setAttribute('content', t('meta.description'))
+
+  for (const el of app.querySelectorAll<HTMLElement>('[data-i18n]')) {
+    el.textContent = t(el.dataset.i18n as MessageKey)
+  }
+  for (const el of app.querySelectorAll<HTMLElement>('[data-i18n-placeholder]')) {
+    el.setAttribute('placeholder', t(el.dataset.i18nPlaceholder as MessageKey))
+  }
+  for (const el of app.querySelectorAll<HTMLElement>('[data-i18n-alt]')) {
+    el.setAttribute('alt', t(el.dataset.i18nAlt as MessageKey))
+  }
+  showError(errorKey)
 }
 
 function clearPreview(): void {
@@ -154,3 +178,11 @@ downloadButton.addEventListener('click', () => {
     void downloadPng(currentUrl, size, buildFilename(currentUrl, 'png', size))
   }
 })
+
+langSwitch.addEventListener('click', () => {
+  setLanguage(getLanguage() === 'zh-TW' ? 'en' : 'zh-TW')
+  applyLanguage()
+})
+
+initLanguage()
+applyLanguage()

@@ -1,4 +1,7 @@
 export const zhTW = {
+  'lang.switch': 'English',
+  'meta.title': 'QR Code 產生器 | 網址轉 QR Code',
+  'meta.description': '免費的網址 QR Code 產生器：輸入網址即可產生 QR Code，並下載 PNG 或 SVG。所有處理都在你的裝置上完成。',
   'app.title': 'QR Code 產生器',
   'app.description': '輸入網址，立即產生可下載的 QR Code',
   'input.label': '網址',

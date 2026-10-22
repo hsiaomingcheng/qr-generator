@@ -98,7 +98,7 @@ A purely client-side web tool: the user enters a URL → a QR code is generated 
 ### 4.5 Internationalisation (`src/i18n/`)
 
 - Files: `zh-TW.ts` and `en.ts`, both exporting objects with the same structure (use a TypeScript type to guarantee both have identical keys).
-- Default language: if `navigator.languages` contains an entry starting with `zh` → `zh-TW`; otherwise `en`.
+- Default language: look only at the first (highest-priority) entry of `navigator.languages`; if it starts with `zh` → `zh-TW`; otherwise `en`. (Later entries are ignored, so `["en-US", "zh-TW"]` → `en`.)
 - When the user switches language, save it to `localStorage` (wrap reads and writes in `try/catch`; if it fails, treat it as not saved).
 - When switching, also update `<html lang>`, the page title, and the `meta description`.
 - Note: search engines and LINE/Facebook link previews **do not run JavaScript** — they only read what is hard-coded in `index.html`. So the `<title>`, `meta description`, and Open Graph tags in `index.html` must be written as fixed bilingual text (e.g. "QR Code 產生器 | URL to QR Code Generator"), not switched by JS.

@@ -47,6 +47,23 @@ h1 {
   font-size: 1.5rem;
 }
 
+header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.lang-switch {
+  flex-shrink: 0;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
 .subtitle {
   margin: 0.25rem 0 1.5rem;
   color: var(--muted);
