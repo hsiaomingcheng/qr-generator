@@ -2,9 +2,10 @@ import './style.css'
 import { t, type MessageKey } from './i18n'
 import { normalizeUrl } from './lib/url'
 import { generateQr } from './lib/qr'
-import { downloadPng } from './lib/download'
+import { DEFAULT_PNG_SIZE, buildFilename, downloadPng, downloadSvg } from './lib/download'
 
 const DEBOUNCE_MS = 300
+const PNG_SIZES = [256, 512, 1024, 2048]
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 app.innerHTML = `
@@ -38,7 +39,24 @@ app.innerHTML = `
       </div>
     </section>
 
-    <button id="download" type="button" disabled>${t('download.png')}</button>
+    <div class="options">
+      <div class="field">
+        <label for="format-select">${t('download.format')}</label>
+        <select id="format-select">
+          <option value="png" selected>PNG</option>
+          <option value="svg">SVG</option>
+        </select>
+      </div>
+      <div class="field" id="size-field">
+        <label for="size-select">${t('download.size')}</label>
+        <select id="size-select">
+          ${PNG_SIZES.map((s) => `<option value="${s}"${s === DEFAULT_PNG_SIZE ? ' selected' : ''}>${s} px</option>`).join('')}
+        </select>
+      </div>
+      <p id="vector-note" class="vector-note" hidden>${t('download.vectorNote')}</p>
+    </div>
+
+    <button id="download" type="button" disabled>${t('download.button')}</button>
 
     <footer><p>${t('privacy.note')}</p></footer>
   </main>
@@ -51,6 +69,10 @@ const result = app.querySelector<HTMLDivElement>('#result')!
 const qrImage = app.querySelector<HTMLImageElement>('#qr-image')!
 const encodedUrl = app.querySelector<HTMLElement>('#encoded-url')!
 const downloadButton = app.querySelector<HTMLButtonElement>('#download')!
+const formatSelect = app.querySelector<HTMLSelectElement>('#format-select')!
+const sizeSelect = app.querySelector<HTMLSelectElement>('#size-select')!
+const sizeField = app.querySelector<HTMLDivElement>('#size-field')!
+const vectorNote = app.querySelector<HTMLParagraphElement>('#vector-note')!
 
 let currentUrl: string | null = null
 let debounceTimer: number | undefined
@@ -117,6 +139,18 @@ input.addEventListener('blur', () => {
   void update(true)
 })
 
+formatSelect.addEventListener('change', () => {
+  const isSvg = formatSelect.value === 'svg'
+  sizeField.hidden = isSvg
+  vectorNote.hidden = !isSvg
+})
+
 downloadButton.addEventListener('click', () => {
-  if (currentUrl) void downloadPng(currentUrl)
+  if (!currentUrl) return
+  if (formatSelect.value === 'svg') {
+    void downloadSvg(currentUrl, buildFilename(currentUrl, 'svg'))
+  } else {
+    const size = Number(sizeSelect.value)
+    void downloadPng(currentUrl, size, buildFilename(currentUrl, 'png', size))
+  }
 })
