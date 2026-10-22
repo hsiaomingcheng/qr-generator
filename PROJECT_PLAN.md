@@ -209,7 +209,7 @@ Finish and verify each phase before moving to the next. Commit at the end of eac
 - [x] iPhone built-in camera successfully scans the QR code on screen
 - [ ] Android camera (or Google Lens) successfully scans — _not tested: no Android device_
 - [x] PNG and SVG downloads work in desktop Chrome / Safari (files open and are not empty) — _Firefox not tested: not installed_
-- [ ] A very long URL (200+ characters) shows the warning, and the generated QR code still scans — _warning verified; scanning the long-URL code not confirmed_
+- [x] A very long URL (200+ characters) shows the warning, and the generated QR code still scans
 - [x] No error messages pop up mid-typing; they only appear on blur or Enter
 - [x] In dark mode, the QR code is still a black pattern on a white background
 - [x] No horizontal scrolling at mobile width
