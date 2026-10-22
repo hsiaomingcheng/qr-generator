@@ -206,21 +206,21 @@ Finish and verify each phase before moving to the next. Commit at the end of eac
 ## 7. Manual Testing Checklist
 
 **Testable locally (Phase 4)**
-- [ ] iPhone built-in camera successfully scans the QR code on screen
-- [ ] Android camera (or Google Lens) successfully scans
-- [ ] PNG and SVG downloads work in desktop Chrome / Firefox / Safari (files open and are not empty)
-- [ ] A very long URL (200+ characters) shows the warning, and the generated QR code still scans
-- [ ] No error messages pop up mid-typing; they only appear on blur or Enter
-- [ ] In dark mode, the QR code is still a black pattern on a white background
-- [ ] No horizontal scrolling at mobile width
-- [ ] In the browser dev tools Network tab, confirm there are **no outgoing requests** when entering a URL
+- [x] iPhone built-in camera successfully scans the QR code on screen
+- [ ] Android camera (or Google Lens) successfully scans — _not tested: no Android device_
+- [x] PNG and SVG downloads work in desktop Chrome / Safari (files open and are not empty) — _Firefox not tested: not installed_
+- [ ] A very long URL (200+ characters) shows the warning, and the generated QR code still scans — _warning verified; scanning the long-URL code not confirmed_
+- [x] No error messages pop up mid-typing; they only appear on blur or Enter
+- [x] In dark mode, the QR code is still a black pattern on a white background
+- [x] No horizontal scrolling at mobile width
+- [x] In the browser dev tools Network tab, confirm there are **no outgoing requests** when entering a URL
 
 **Requires the live URL (Phase 6)**
-- [ ] PNG and SVG downloads work in iPhone Safari and Android Chrome
-- [ ] Opened inside LINE: the notice appears, and long-pressing the image saves it
-- [ ] Pasting the site URL into LINE / Facebook shows a link preview with title and image
-- [ ] A downloaded 2048px PNG printed at about 3cm × 3cm still scans
-- [ ] The SVG imported into Word / print software stays sharp when enlarged
+- [x] PNG and SVG downloads work in iPhone Safari — _Android Chrome not tested: no Android device_
+- [x] Opened inside LINE: the notice appears, and long-pressing the image saves it (the download button does not work in LINE, as expected)
+- [x] Pasting the site URL into LINE shows a link preview with title and image — _Facebook not tested_
+- [ ] A downloaded 2048px PNG printed at about 3cm × 3cm still scans — _not tested: no printer_
+- [ ] The SVG imported into Word / print software stays sharp when enlarged — _not tested: no such software; the SVG stays sharp when zoomed in Chrome_
 
 ## 8. Deployment: Cloudflare
 
