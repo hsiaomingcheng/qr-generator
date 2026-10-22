@@ -7,6 +7,7 @@
   --accent: #1a56db;
   --accent-text: #ffffff;
   --error: #b42318;
+  --warning: #92400e;
   --focus: #1a56db;
 }
 
@@ -20,6 +21,7 @@
     --accent: #6b9bff;
     --accent-text: #0b1220;
     --error: #ff8a80;
+    --warning: #fbbf24;
     --focus: #6b9bff;
   }
 }
@@ -102,6 +104,15 @@ select {
   color: var(--error);
 }
 
+.warning {
+  color: var(--warning);
+}
+
+/* Unlike the error line, the warning does not reserve space when empty. */
+.warning:empty {
+  display: none;
+}
+
 .preview {
   display: flex;
   align-items: center;
@@ -142,6 +153,15 @@ select {
 .encoded code {
   overflow-wrap: anywhere;
   color: var(--text);
+}
+
+.notice {
+  margin: 1rem 0 0;
+  padding: 0.75rem;
+  border: 1px solid var(--warning);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  font-size: 0.875rem;
 }
 
 .options {

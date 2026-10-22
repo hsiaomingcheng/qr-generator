@@ -15,6 +15,8 @@ export const zhTW = {
   'download.button': '下載',
   'error.invalidUrl': '網址格式不正確，請檢查後再試一次',
   'error.unsupportedProtocol': '只支援 http:// 或 https:// 開頭的網址',
+  'warning.dense': '網址很長，QR Code 會很密集，可能不容易掃描。建議先縮短網址再產生',
+  'notice.inAppBrowser': '在 LINE、Facebook 等 App 內建的瀏覽器中，下載可能無法使用，請改為長按上方圖片來儲存',
   'error.tooLong': '網址太長，無法產生 QR Code，請先縮短網址',
   'privacy.note': '所有處理都在你的裝置上完成，你輸入的網址不會被上傳',
 } as const

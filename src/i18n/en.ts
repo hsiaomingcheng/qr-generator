@@ -18,6 +18,8 @@ export const en: Record<MessageKey, string> = {
   'download.button': 'Download',
   'error.invalidUrl': 'This URL looks invalid. Please check it and try again',
   'error.unsupportedProtocol': 'Only URLs starting with http:// or https:// are supported',
+  'warning.dense': 'This URL is long, so the QR code is very dense and may be hard to scan. Consider shortening the URL first',
+  'notice.inAppBrowser': 'Downloads may not work in the built-in browser of apps like LINE or Facebook. Long-press the image above to save it instead',
   'error.tooLong': 'This URL is too long to encode. Please shorten it first',
   'privacy.note': 'Everything is processed on your device; your URL is never uploaded',
 }

@@ -2,6 +2,7 @@ import './style.css'
 import { getLanguage, initLanguage, setLanguage, t, type MessageKey } from './i18n'
 import { normalizeUrl } from './lib/url'
 import { generateQr } from './lib/qr'
+import { isInAppBrowser } from './lib/inAppBrowser'
 import { DEFAULT_PNG_SIZE, buildFilename, downloadPng, downloadSvg } from './lib/download'
 
 const DEBOUNCE_MS = 300
@@ -33,6 +34,7 @@ app.innerHTML = `
     </div>
 
     <p id="message" class="message" aria-live="polite"></p>
+    <p id="warning" class="message warning" aria-live="polite"></p>
 
     <section class="preview">
       <p id="empty-hint" class="empty-hint" data-i18n="preview.empty"></p>
@@ -41,6 +43,8 @@ app.innerHTML = `
         <p class="encoded"><span data-i18n="preview.encodedUrl"></span><code id="encoded-url"></code></p>
       </div>
     </section>
+
+    <p id="in-app-notice" class="notice" data-i18n="notice.inAppBrowser" role="note" hidden></p>
 
     <div class="options">
       <div class="field">
@@ -67,6 +71,7 @@ app.innerHTML = `
 
 const input = app.querySelector<HTMLInputElement>('#url-input')!
 const message = app.querySelector<HTMLParagraphElement>('#message')!
+const warning = app.querySelector<HTMLParagraphElement>('#warning')!
 const emptyHint = app.querySelector<HTMLParagraphElement>('#empty-hint')!
 const result = app.querySelector<HTMLDivElement>('#result')!
 const qrImage = app.querySelector<HTMLImageElement>('#qr-image')!
@@ -82,10 +87,16 @@ let currentUrl: string | null = null
 let debounceTimer: number | undefined
 let updateId = 0
 let errorKey: MessageKey | null = null
+let isDense = false
 
 function showError(key: MessageKey | null): void {
   errorKey = key
   message.textContent = key ? t(key) : ''
+}
+
+function showWarning(dense: boolean): void {
+  isDense = dense
+  warning.textContent = dense ? t('warning.dense') : ''
 }
 
 // Re-renders every piece of text, so switching language never touches the input or the preview.
@@ -104,10 +115,12 @@ function applyLanguage(): void {
     el.setAttribute('alt', t(el.dataset.i18nAlt as MessageKey))
   }
   showError(errorKey)
+  showWarning(isDense)
 }
 
 function clearPreview(): void {
   currentUrl = null
+  showWarning(false)
   result.hidden = true
   emptyHint.hidden = false
   downloadButton.disabled = true
@@ -144,6 +157,7 @@ async function update(showErrors: boolean): Promise<void> {
   emptyHint.hidden = true
   downloadButton.disabled = false
   showError(null)
+  showWarning(qr.dense)
 }
 
 input.addEventListener('input', () => {
@@ -183,6 +197,9 @@ langSwitch.addEventListener('click', () => {
   setLanguage(getLanguage() === 'zh-TW' ? 'en' : 'zh-TW')
   applyLanguage()
 })
+
+// The preview is always an <img>, so long-press-to-save works whether or not we detect an in-app browser.
+app.querySelector<HTMLParagraphElement>('#in-app-notice')!.hidden = !isInAppBrowser(navigator.userAgent)
 
 initLanguage()
 applyLanguage()
