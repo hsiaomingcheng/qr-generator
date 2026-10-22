@@ -1,28 +1,37 @@
+/*
+ * Design: a printed proof. Ink on cool paper, one process-magenta accent,
+ * and the QR code as a white label with crop marks (added in the preview section).
+ */
 :root {
-  --bg: #f6f7f9;
-  --text: #1c1e21;
-  --muted: #5f6672;
-  --surface: #ffffff;
-  --border: #cfd4dc;
-  --accent: #1a56db;
-  --accent-text: #ffffff;
+  --paper: #f3f4f6;
+  --ink: #101114;
+  --muted: #5b6068;
+  --rule: #c9ccd3;
+  --field: #ffffff;
+  --label: #ffffff; /* the QR label stays white in every theme */
+  --accent: #e4007c;
+  --accent-ink: #ffffff;
+  --cyan: #00a3e0;
   --error: #b42318;
   --warning: #92400e;
-  --focus: #1a56db;
+  --radius: 0.375rem;
+  --font-ui:
+    'Bricolage Grotesque Variable', system-ui, -apple-system, 'PingFang TC', 'Noto Sans TC',
+    'Microsoft JhengHei', sans-serif;
+  --font-code: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #14161a;
-    --text: #e8eaed;
-    --muted: #9aa1ad;
-    --surface: #1e2127;
-    --border: #3a3f48;
-    --accent: #6b9bff;
-    --accent-text: #0b1220;
+    --paper: #0e0f12;
+    --ink: #eceef2;
+    --muted: #9ba0aa;
+    --rule: #2c2f36;
+    --field: #17191e;
+    --accent: #ff4fa3;
+    --accent-ink: #101114;
     --error: #ff8a80;
     --warning: #fbbf24;
-    --focus: #6b9bff;
   }
 }
 
@@ -32,45 +41,96 @@
 
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans TC', sans-serif;
-  line-height: 1.5;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  line-height: 1.55;
 }
 
 .page {
-  max-width: 32rem;
+  max-width: 64rem;
   margin: 0 auto;
-  padding: 1.5rem 1rem 2rem;
+  padding: 1.5rem 1rem 2.5rem;
 }
 
-h1 {
-  margin: 0;
-  font-size: 1.5rem;
+[hidden] {
+  display: none !important;
 }
 
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---- Header ---- */
 header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
 }
 
-.lang-switch {
-  flex-shrink: 0;
-  padding: 0.375rem 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  background: var(--surface);
-  color: var(--text);
-  cursor: pointer;
+h1 {
+  margin: 0;
+  font-size: clamp(1.75rem, 1.3rem + 2vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
 }
 
 .subtitle {
-  margin: 0.25rem 0 1.5rem;
+  max-width: 34rem;
+  margin: 0.5rem 0 0;
   color: var(--muted);
 }
 
+/* ---- Workspace layout: one column on phones, controls + sticky proof on desktop ---- */
+.workspace {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 52rem) {
+  .workspace {
+    column-gap: 3rem;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    grid-template-areas:
+      'input    proof'
+      'msgs     proof'
+      'notice   proof'
+      'options  proof'
+      'download proof'
+      '.        proof';
+    grid-template-rows: repeat(5, auto) 1fr;
+  }
+
+  .area-input {
+    grid-area: input;
+  }
+  .area-msgs {
+    grid-area: msgs;
+  }
+  .area-notice {
+    grid-area: notice;
+  }
+  .area-options {
+    grid-area: options;
+  }
+  .area-download {
+    grid-area: download;
+  }
+  .area-proof {
+    grid-area: proof;
+    align-self: start;
+    position: sticky;
+    top: 1.5rem;
+  }
+}
+
+/* ---- Form controls ---- */
 .field label {
   display: block;
   margin-bottom: 0.375rem;
@@ -86,88 +146,104 @@ button {
 input,
 select {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  background: var(--surface);
-  color: var(--text);
+  min-height: 3.25rem;
+  padding: 0.625rem 0.875rem;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background-color: var(--field);
+  color: var(--ink);
 }
 
-:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 2px;
+input {
+  font-size: 1.125rem;
 }
 
-.message {
-  min-height: 1.5rem;
-  margin: 0.5rem 0;
-  color: var(--error);
+input::placeholder {
+  color: var(--muted);
+  opacity: 1;
 }
 
-.warning {
-  color: var(--warning);
+input:focus-visible,
+select:focus-visible {
+  border-color: var(--accent);
 }
 
-/* Unlike the error line, the warning does not reserve space when empty. */
-.warning:empty {
-  display: none;
+/* A drawn chevron instead of the native arrow, so the selects match the inputs in every browser. */
+select {
+  appearance: none;
+  padding-right: 2.5rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink) 50%),
+    linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.3rem) 50%,
+    calc(100% - 0.95rem) 50%;
+  background-size: 0.375rem 0.375rem;
+  background-repeat: no-repeat;
+  cursor: pointer;
 }
 
-.preview {
+#download {
+  display: block;
+  width: 100%;
+  min-height: 3.5rem;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#download:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+#download:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+#download:disabled {
+  border-color: var(--rule);
+  background: transparent;
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+/* Both languages are always visible; the active one is filled. */
+.lang-switch {
+  display: inline-flex;
+  flex-shrink: 0;
+  min-height: 2.75rem;
+  padding: 3px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.lang-switch span {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 16rem;
-  padding: 1rem;
-  border: 1px dashed var(--border);
-  border-radius: 0.75rem;
-  background: var(--surface);
-  text-align: center;
+  min-width: 2.75rem;
+  padding: 0 0.5rem;
+  border-radius: 2px;
+  font-weight: 700;
 }
 
-.empty-hint {
-  margin: 0;
-  color: var(--muted);
-}
-
-/* The QR code stays black on white in dark mode; never invert it. */
-.qr-image {
-  display: block;
-  width: 100%;
-  max-width: 16rem;
-  height: auto;
-  margin: 0 auto;
-  background: #ffffff;
-}
-
-.encoded {
-  margin: 0.75rem 0 0;
-  font-size: 0.875rem;
-  color: var(--muted);
-}
-
-.encoded span {
-  display: block;
-}
-
-.encoded code {
-  overflow-wrap: anywhere;
-  color: var(--text);
-}
-
-.notice {
-  margin: 1rem 0 0;
-  padding: 0.75rem;
-  border: 1px solid var(--warning);
-  border-radius: 0.5rem;
-  background: var(--surface);
-  font-size: 0.875rem;
+:root[lang='zh-TW'] .lang-switch [data-l='zh-TW'],
+:root[lang='en'] .lang-switch [data-l='en'] {
+  background: var(--ink);
+  color: var(--paper);
 }
 
 .options {
   display: flex;
   gap: 0.75rem;
-  margin-top: 1rem;
 }
 
 .options .field {
@@ -178,35 +254,156 @@ select {
   flex: 1;
   align-self: flex-end;
   margin: 0;
-  padding-bottom: 0.75rem;
+  padding-bottom: 0.875rem;
   color: var(--muted);
   font-size: 0.875rem;
 }
 
-#download {
+/* ---- Messages ---- */
+/* No reserved height: the block disappears (gap included) while there is nothing to say. */
+.msgs:not(:has(.message:not(:empty))) {
+  display: none;
+}
+
+.message {
+  margin: 0;
+  padding-left: 0.75rem;
+  border-left: 4px solid var(--error);
+  color: var(--error);
+}
+
+.warning {
+  border-left-color: var(--warning);
+  color: var(--warning);
+}
+
+.message:empty {
+  display: none;
+}
+
+.notice {
+  margin: 0;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--warning);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+}
+
+/* ---- Preview: a white label framed by crop marks ---- */
+.preview {
+  max-width: 26rem;
+}
+
+/* The marks extend the label's edges, so they show where the 4-module quiet zone ends. */
+.frame {
+  --pad: 1.25rem;
+  --mark: 0.875rem;
+  --weight: 1.5px;
+  --edge: calc(var(--pad) - var(--weight));
+  padding: var(--pad);
+  background:
+    linear-gradient(var(--ink), var(--ink)) left 0 top var(--edge) / var(--mark) var(--weight) no-repeat,
+    linear-gradient(var(--ink), var(--ink)) left var(--edge) top 0 / var(--weight) var(--mark) no-repeat,
+    linear-gradient(var(--ink), var(--ink)) right 0 top var(--edge) / var(--mark) var(--weight) no-repeat,
+    linear-gradient(var(--ink), var(--ink)) right var(--edge) top 0 / var(--weight) var(--mark) no-repeat,
+    linear-gradient(var(--ink), var(--ink)) left 0 bottom var(--edge) / var(--mark) var(--weight) no-repeat,
+    linear-gradient(var(--ink), var(--ink)) left var(--edge) bottom 0 / var(--weight) var(--mark) no-repeat,
+    linear-gradient(var(--ink), var(--ink)) right 0 bottom var(--edge) / var(--mark) var(--weight) no-repeat,
+    linear-gradient(var(--ink), var(--ink)) right var(--edge) bottom 0 / var(--weight) var(--mark) no-repeat;
+}
+
+.label {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--label);
+  box-shadow: 0 0 0 1px var(--rule);
+}
+
+.ghost {
   display: block;
   width: 100%;
-  margin-top: 1rem;
-  padding: 0.75rem 1rem;
-  border: 0;
-  border-radius: 0.5rem;
-  background: var(--accent);
-  color: var(--accent-text);
-  font-weight: 600;
-  cursor: pointer;
+  height: 100%;
+  padding: 13.8%; /* the 4-module quiet zone of a 29-module code */
+  color: #d3d6dc;
 }
 
-#download:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+/* The QR code stays black on white in dark mode; never invert it. */
+.qr-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
 }
 
-footer {
-  margin-top: 1.5rem;
-  font-size: 0.8125rem;
+.scan {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: var(--cyan);
+  box-shadow: 0 0 14px 2px var(--cyan);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.scanning .scan {
+  animation: scan 0.7s ease-in forwards;
+}
+
+@keyframes scan {
+  from {
+    top: 0;
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  to {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scanning .scan {
+    animation: none;
+  }
+}
+
+.empty-hint {
+  margin: 0.25rem 0 0;
   color: var(--muted);
 }
 
-[hidden] {
-  display: none !important;
+.encoded {
+  margin: 0.25rem 0 0;
+}
+
+.encoded span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.encoded code {
+  overflow-wrap: anywhere;
+  font-family: var(--font-code);
+  font-size: 0.9375rem;
+}
+
+/* ---- Footer ---- */
+footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+footer p {
+  max-width: 40rem;
+  margin: 0;
 }
